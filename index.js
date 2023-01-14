@@ -18,11 +18,61 @@ async function run() {
     try {
         const informationCollection = client.db('digitalComp').collection('information')
         const categoryCollection = client.db('digitalComp').collection('categories')
+        const productsCollection = client.db('digitalComp').collection('products')
 
 
         app.get('/categories', async (req, res) => {
             const query = {}
             const result = await categoryCollection.find(query).toArray()
+            res.send(result)
+        })
+
+        
+        app.get('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { categoryId: id };
+            console.log(query)
+            const result = await productsCollection.find(query).toArray();
+            res.send(result);
+
+        })
+
+        app.post('/products', async (req, res) => {
+            const item = req.body
+            console.log(item)
+            const result = await productsCollection.insertOne(item)
+            res.send(result)
+        })
+
+        app.get('/products/:id/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            console.log(query)
+            const result = await productsCollection.find(query).toArray();
+            res.send(result);
+
+        })
+
+        app.put('/products/:id', async(req, res) =>{
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const user = req.body;
+            console.log(user)
+            const option = {upsert: true};
+            const updatedUser = {
+                $set: {
+                  name: user.name,
+                  price: user.price
+                }
+            }
+            const result = await productsCollection.updateOne(filter, updatedUser, option);
+            res.send(result);
+         })
+
+        app.delete('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(query);
             res.send(result)
         })
 
