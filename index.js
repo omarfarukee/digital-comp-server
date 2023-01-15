@@ -27,7 +27,44 @@ async function run() {
             res.send(result)
         })
 
-        
+        app.post('/categories', async (req, res) => {
+            const item = req.body
+            console.log(item)
+            const result = await categoryCollection.insertOne(item)
+            res.send(result)
+        })
+
+        app.put('/categories/:id', async(req, res) =>{
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const user = req.body;
+            console.log(user)
+            const option = {upsert: true};
+            const updatedUser = {
+                $set: {
+                  name: user.name
+                 }
+            }
+            const result = await categoryCollection.updateOne(filter, updatedUser, option);
+            res.send(result);
+         })
+
+         app.get('/categories/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            console.log(query)
+            const result = await categoryCollection.find(query).toArray();
+            res.send(result);
+
+        })
+
+        app.delete('/categories/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await categoryCollection.deleteOne(query);
+            res.send(result)
+        })
+
         app.get('/products/:id', async (req, res) => {
             const id = req.params.id;
             const query = { categoryId: id };
@@ -36,7 +73,7 @@ async function run() {
             res.send(result);
 
         })
-
+        
         app.post('/products', async (req, res) => {
             const item = req.body
             console.log(item)
@@ -44,6 +81,7 @@ async function run() {
             res.send(result)
         })
 
+        
         app.get('/products/:id/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
